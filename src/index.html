@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Web Client</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        main {
+            width: 80%;
+            margin: 20px auto;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+        }
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #e8f5e9;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>API Web Client</h1>
+    </header>
+
+    <main>
+        <!-- Formulario para crear un usuario -->
+        <div class="form-container" id="userForm">
+            <h2>Crear Usuario</h2>
+            <form id="createUserForm">
+                <label for="name">Nombre:</label>
+                <input type="text" id="name" required>
+
+                <label for="telefono">Teléfono:</label>
+                <input type="text" id="telefono" required>
+
+                <button type="submit">Crear Usuario</button>
+            </form>
+        </div>
+
+        <!-- Formulario para actualizar un usuario -->
+        <div class="form-container" id="updateForm">
+            <h2>Actualizar Usuario</h2>
+            <form id="updateUserForm">
+                <label for="userId">ID del Usuario:</label>
+                <input type="number" id="userId" required>
+
+                <label for="updateName">Nuevo Nombre:</label>
+                <input type="text" id="updateName" required>
+
+                <label for="updateTelefono">Nuevo Teléfono:</label>
+                <input type="text" id="updateTelefono" required>
+
+                <button type="submit">Actualizar Usuario</button>
+            </form>
+        </div>
+
+        <!-- Formulario para eliminar un usuario -->
+        <div class="form-container" id="deleteForm">
+            <h2>Eliminar Usuario</h2>
+            <form id="deleteUserForm">
+                <label for="deleteUserId">ID del Usuario:</label>
+                <input type="number" id="deleteUserId" required>
+
+                <button type="submit">Eliminar Usuario</button>
+            </form>
+        </div>
+
+        <!-- Botón para obtener usuarios -->
+        <div class="form-container">
+            <h2>Obtener Usuarios</h2>
+            <button onclick="getUsers()">Obtener Usuarios</button>
+            <ul id="userList"></ul>
+        </div>
+    </main>
+
+    <script>
+        // Función para enviar datos y crear un usuario
+        document.getElementById('createUserForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const telefono = document.getElementById('telefono').value;
+
+            fetch('http://localhost:5000/api/v1/users/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: name, telefono: telefono })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                getUsers();  // Actualizar lista de usuarios después de crear uno nuevo
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        // Función para obtener la lista de usuarios
+        function getUsers() {
+            fetch('http://localhost:5000/api/v1/users', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                const userList = document.getElementById('userList');
+                userList.innerHTML = '';
+                // Mostrar usuarios en la lista
+                data.forEach(user => {
+                    const li = document.createElement('li');
+                    li.textContent = `ID: ${user.id} - Nombre: ${user.name}, Teléfono: ${user.telefono}`;
+                    userList.appendChild(li);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Función para actualizar un usuario
+        document.getElementById('updateUserForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const userId = document.getElementById('userId').value;
+            const updateName = document.getElementById('updateName').value;
+            const updateTelefono = document.getElementById('updateTelefono').value;
+
+            fetch(`http://localhost:5000/api/v1/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: updateName, telefono: updateTelefono })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                getUsers();  // Actualizar lista de usuarios después de actualizar uno
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        // Función para eliminar un usuario
+        document.getElementById('deleteUserForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const userId = document.getElementById('deleteUserId').value;
+
+            fetch(`http://localhost:5000/api/v1/users/${userId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                getUsers();  // Actualizar lista de usuarios después de eliminar uno
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
