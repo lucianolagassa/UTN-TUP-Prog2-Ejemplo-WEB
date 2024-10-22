@@ -3,12 +3,11 @@ Ejemplo de Cliente Web de Servidor API para la Asignatura Programacion II de la 
 
 **************************
 
-**Requerimientos**
- - NodeJS y NPM instalados
+## Requerimientos
+ - **NodeJS** y **NPM** instalados
 
-**Guia de Uso**
-
+## Guia de Uso
 Luego de clonar el repositorio, Ingresar a la carpeta que contiene el codigo fuente, Ejecutar los siguientes comandos
 
- - Instalar dependencias: npm install
- - Iniciar proyecto: node src/index.jd
+ - Instalar dependencias: *npm install*
+ - Iniciar proyecto: *node src/index.jd*
